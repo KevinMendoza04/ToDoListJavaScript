@@ -1,34 +1,64 @@
 import './style.css'
+
 import notFoundView from './views/notFoundView.js'
 import homeView from './views/homeView.js'
 import loginView from './views/loginView.js'
+import userView from './views/userView.js'
+
 import { loginController } from './controllers/login.controller.js'
+
 import layout from './components/layout.js'
 
 const appContainer = document.getElementById("app")
+
 const router = {
-  "home": {
-    view: homeView()
+  home: {
+    view: homeView,
   },
-  "login": {
-    view: loginView(),
+
+  login: {
+    view: loginView,
     controller: loginController
   },
+
+  users: {
+    view: userView
+  }
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const path = window.location.pathname.replace("/", "")
+async function renderRoute() {
 
-  if (path !== "login" && router[path]?.view) {
-    const content = layout(router[path].view)
-    appContainer.innerHTML = content
-    await router[path].controller
+  const path = window.location.hash.replace("#", "") || ""
 
-  } else if (path === "login") {
-    appContainer.innerHTML = router[path].view
-    await router[path].controller()
-    
-  } else {
+  const route = router[path]
+
+  if (!route) {
     appContainer.innerHTML = notFoundView()
+    return
   }
-})
+
+  // LOGIN sin layout
+  if (path === "login") {
+    appContainer.innerHTML = route.view()
+
+    if (route.controller) {
+      await route.controller()
+    }
+
+    return
+  }
+
+  // resto con layout
+  appContainer.innerHTML = layout()
+
+  document.getElementById("principal_content").innerHTML =
+    route.view()
+
+  if (route.controller) {
+    await route.controller()
+  }
+}
+
+document.addEventListener("DOMContentLoaded", renderRoute)
+
+window.addEventListener("hashchange", renderRoute)
