@@ -1,0 +1,21 @@
+{
+    "users":[
+        {
+            "id": 1,
+            "username":"juancho.rois",
+            "email": "juan@mail.com",
+            "password": "juancho",
+            "full_name": "Juan Rois",
+            "role": "admin"
+        },
+        {
+            "id": 2,
+            "username":"luisita.rose",
+            "email": "luisita@mail.com",
+            "password": "luisita",
+            "full_name": "Luisita Rose",
+            "role": "user"
+        }
+    ],
+    "todo_list":[]
+}
