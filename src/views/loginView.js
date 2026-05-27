@@ -8,7 +8,6 @@ export default function loginView() {
             <input type="password" name="password" id="password" class="bg-gray-200 rounded-lg p-2" placeholder="*********">
             
             <button id="btnLogin" class="bg-indigo-200 hover:bg-indigo-400 cursor-pointer py-2 rounded-xl">Login</button>
-
           </form>
         </div>
         <div class="col-span-1 hidden md:block h-full bg-cyan-300"></div>

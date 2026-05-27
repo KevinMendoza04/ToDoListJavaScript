@@ -3,19 +3,13 @@ const views = [
   {
     name: "home",
     route: "#home",
-    role: ["admin", "user",],
+    role: ["admin", "user"],
     icon: ""
   },
   {
     name: "users",
     route: "#users",
     role: ["admin"],
-    icon: ""
-  },
-  {
-    name: "example",
-    route: "#example",
-    role: ["user"],
     icon: ""
   }
 ]
@@ -49,10 +43,10 @@ export default function layout() {
         <sidebar class="bg-sky-600 min-h-screen col-span-1">
           <div class="flex flex-col ml-6">
             ${routes.map((item) => {
-    return item
-  }).join("")
-    }
-          </div>
+                return item
+              }).join("")
+                }
+            </div>
         </sidebar>
         <main 
         id="principal_content" 

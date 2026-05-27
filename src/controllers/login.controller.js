@@ -17,7 +17,7 @@ export async function loginController(){
         
         if(userData){
             localStorage.setItem("user", JSON.stringify(userData[0]))
-            window.location.href = "/home"
+            window.location.href = "#home"
         }else{
             alert("User or password are wrong!!!")
         }
@@ -27,6 +27,5 @@ export async function loginController(){
 async function loginFunction(username, password){
     const response = await fetch(`http://localhost:3000/users?username=${username}&password=${password}`) //Query params
     const data = await response.json()
-    
     return data
 }

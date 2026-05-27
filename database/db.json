@@ -1,21 +1,32 @@
 {
-    "users":[
-        {
-            "id": 1,
-            "username":"juancho.rois",
-            "email": "juan@mail.com",
-            "password": "juancho",
-            "full_name": "Juan Rois",
-            "role": "admin"
-        },
-        {
-            "id": 2,
-            "username":"luisita.rose",
-            "email": "luisita@mail.com",
-            "password": "luisita",
-            "full_name": "Luisita Rose",
-            "role": "user"
-        }
-    ],
-    "todo_list":[]
+  "users": [
+    {
+      "id": "1",
+      "username": "juancho.rois",
+      "email": "juan@mail.com",
+      "password": "juancho",
+      "full_name": "Juan Rois",
+      "role": "admin"
+    },
+    {
+      "id": "2",
+      "username": "luisita.rose",
+      "email": "luisita@mail.com",
+      "password": "luisita",
+      "full_name": "Luisita Rose",
+      "role": "user"
+    },
+    {
+      "id": "3",
+      "username": "pedrito.perez",
+      "email": "pedrito@mail.com",
+      "password": "pedrito",
+      "full_name": "Pedro Perez",
+      "role": "user"
+    }
+  ],
+  "todo_list": [
+
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
