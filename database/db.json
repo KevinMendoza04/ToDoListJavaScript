@@ -2,10 +2,10 @@
   "users": [
     {
       "id": "1",
-      "username": "juancho.rois",
-      "email": "juan@mail.com",
-      "password": "juancho",
-      "full_name": "Juan Rois",
+      "username": "kevin.mendoza",
+      "email": "kevin@mail.com",
+      "password": "Focused123",
+      "full_name": "Kevin Mendoza",
       "role": "admin"
     },
     {
@@ -26,7 +26,54 @@
     }
   ],
   "todo_list": [
-
-  ],
-  "$schema": "./node_modules/json-server/schema.json"
+    {
+      "id": "1",
+      "id_user": "2",
+      "title": "Comprar víveres",
+      "description": "Ir al supermercado a comprar frutas, verduras y lácteos",
+      "status": "process"
+    },
+    {
+      "id": "3",
+      "id_user": "3",
+      "title": "Hacer ejercicio",
+      "description": "Rutina de 30 minutos en el gimnasio",
+      "status": "initial"
+    },
+    {
+      "id": "4",
+      "id_user": "3",
+      "title": "Leer un libro",
+      "description": "Continuar leyendo Clean Code",
+      "status": "completed"
+    },
+    {
+      "id": "5",
+      "id_user": "2",
+      "title": "Entregar proyecto",
+      "description": "Finalizar y entregar el proyecto de Todo App",
+      "status": "initial"
+    },
+    {
+      "id": "6",
+      "id_user": "3",
+      "title": "Llamar al médico",
+      "description": "Agendar cita de control anual",
+      "status": "completed"
+    },
+    {
+      "id": "1780057069313",
+      "id_user": "2",
+      "title": "dormir",
+      "description": "dormir sabrooooso",
+      "status": "initial"
+    },
+    {
+      "id": "1780057140003",
+      "id_user": "2",
+      "title": "dormir",
+      "description": "",
+      "status": "process"
+    }
+  ]
 }
