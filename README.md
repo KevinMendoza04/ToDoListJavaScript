@@ -1,187 +1,207 @@
-# 📝 Todo App — Vanilla JavaScript
+# Todo App — Vanilla JavaScript
 
-Aplicación de gestión de tareas desarrollada con **JavaScript Vanilla**, consumo de API REST con `fetch`, manejo de `localStorage`, filtros con query params y arquitectura basada en vistas y controladores.
-
----
-
-## 🚀 Tecnologías
-
-| Tecnología | Versión | Uso |
-|---|---|---|
-| Node.js | 22.14.0 | Entorno de ejecución |
-| Vite | 6.x | Bundler y dev server |
-| Tailwind CSS | 4.x | Estilos utilitarios |
-| json-server | 0.17.4 | Fake REST API |
-| Inter (Google Fonts) | — | Tipografía |
+Aplicación de gestión de tareas con arquitectura MVC, autenticación basada en roles, filtros dinámicos mediante query params y consumo de API REST.
 
 ---
 
-## 📁 Estructura del proyecto
+## Stack Técnico
+
+- **JavaScript Vanilla** — sin frameworks, manipulación directa del DOM
+- **Vite 6.x** — bundler y dev server con HMR
+- **Tailwind CSS 4.x** — utility-first styling
+- **json-server** — mock REST API para desarrollo
+- **Node.js 22.14.0** — runtime
+
+---
+
+## Arquitectura
+
+### Patrón MVC Simplificado
 
 ```
-├── database/
-│   └── db.json                  # Base de datos de la fake API
-├── public/
-│   ├── favicon.svg
-│   └── icons.svg
-├── src/
-│   ├── assets/                  # Imágenes y recursos estáticos
-│   ├── components/
-│   │   └── layout.js            # Layout principal con sidebar y header
-│   ├── controllers/
-│   │   ├── home.controller.js   # Lógica de tareas (CRUD, filtros, modales)
-│   │   ├── login.controller.js  # Lógica de autenticación
-│   │   ├── todo.controller.js   # Funciones fetch hacia la API
-│   │   └── user.controller.js   # Lógica de listado de usuarios
-│   ├── views/
-│   │   ├── homeView.js          # Vista de tareas con filtros y modales
-│   │   ├── loginView.js         # Vista de login
-│   │   ├── notFoundView.js      # Vista 404
-│   │   └── userView.js          # Vista de usuarios (solo admin)
-│   ├── main.js                  # Router principal (hash-based)
-│   └── style.css                # Estilos globales + Tailwind
-├── index.html
-├── package.json
-└── vite.config.js
+Views (template strings) → Controllers (lógica + eventos) → API (fetch)
+                ↓
+            Router (hash-based)
+```
+
+**Router (`main.js`)**
+- Hash-based routing con soporte de query params
+- Protección de rutas por autenticación y rol
+- Renderizado condicional de layout según tipo de ruta (pública vs protegida)
+
+**Views**
+- Funciones puras que retornan HTML como strings
+- Sin JSX ni templates externos
+- Inyección mediante `innerHTML` en contenedores específicos
+
+**Controllers**
+- Event delegation para optimizar listeners en listas dinámicas
+- Separación entre lógica de negocio y llamadas a API
+- Manejo de estado local (filtros, modales, formularios)
+
+**Layout Component**
+- Sidebar con navegación dinámica según rol del usuario
+- Renderizado condicional de rutas permitidas
+- Persistencia de sesión mediante `localStorage`
+
+---
+
+## Sistema de Autenticación
+
+**Flujo:**
+1. Login valida credenciales contra `/users` con query params
+2. Usuario autenticado se almacena en `localStorage`
+3. Router verifica sesión en cada cambio de ruta
+4. Redirección automática a login si no hay sesión activa
+
+**Control de acceso:**
+- Rutas públicas: `#login`
+- Rutas protegidas: `#home`, `#users`
+- Validación de rol antes de renderizar vistas restringidas
+
+---
+
+## Gestión de Tareas
+
+### CRUD Completo
+
+| Operación | Método | Endpoint | Permisos |
+|---|---|---|---|
+| Listar | GET | `/todo_list?id_user={id}` | User: propias / Admin: todas |
+| Crear | POST | `/todo_list` | User: propias |
+| Actualizar | PUT | `/todo_list/:id` | User: propias / Admin: todas |
+| Cambiar estado | PATCH | `/todo_list/:id` | Admin únicamente |
+| Eliminar | DELETE | `/todo_list/:id` | Admin únicamente |
+
+### Estados de Tarea
+
+```javascript
+{
+  initial: "Tarea sin iniciar",
+  process: "En progreso",
+  completed: "Finalizada"
+}
+```
+
+Transiciones de estado controladas mediante `<select>` con event listener en el contenedor padre (event delegation).
+
+---
+
+## Sistema de Filtros
+
+**Implementación:**
+- Query params en hash: `#home?status=process&search=estudiar&user=2`
+- Sincronización bidireccional entre URL y inputs de filtro
+- Debounce de 300ms en búsqueda por texto
+- Filtros aplicados en cliente sobre dataset completo
+
+**Lógica de filtrado:**
+```javascript
+function applyFilters(tasks, params) {
+  let filtered = [...tasks]
+  if (params.status) filtered = filtered.filter(t => t.status === params.status)
+  if (params.search) filtered = filtered.filter(t => 
+    t.title.toLowerCase().includes(params.search.toLowerCase())
+  )
+  if (params.user) filtered = filtered.filter(t => t.id_user === params.user)
+  return filtered
+}
 ```
 
 ---
 
-## ⚙️ Instalación y uso
+## Roles y Permisos
 
-### Requisitos previos
+### Admin
+- Vista global de todas las tareas
+- Filtro adicional por usuario
+- Cambio de estado mediante dropdown inline
+- Eliminación de cualquier tarea
+- Acceso a vista de usuarios (`#users`)
 
-- Node.js **v22.14.0** (usar nvm recomendado)
-
-```bash
-nvm use 22.14.0
-```
-
-### 1. Instalar dependencias
-
-```bash
-npm install
-```
-
-### 2. Iniciar la fake API (json-server)
-
-```bash
-npm run api
-```
-
-La API quedará disponible en `http://localhost:3000`
-
-### 3. Iniciar el servidor de desarrollo
-
-```bash
-npm run dev
-```
-
-La app quedará disponible en `http://localhost:5173`
-
-> ⚠️ Ambos servidores deben estar corriendo al mismo tiempo.
+### User
+- Vista limitada a tareas propias (`?id_user={current_user_id}`)
+- Creación y edición de tareas propias
+- Sin acceso a cambio de estado ni eliminación
+- Rutas administrativas bloqueadas por router
 
 ---
 
-## 🌐 Endpoints de la API
+## Decisiones de Diseño
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/users` | Obtener todos los usuarios |
-| GET | `/todo_list` | Obtener todas las tareas |
-| GET | `/todo_list?id_user=2` | Tareas de un usuario específico |
-| POST | `/todo_list` | Crear nueva tarea |
-| PUT | `/todo_list/:id` | Actualizar tarea completa |
-| PATCH | `/todo_list/:id` | Actualizar campo específico |
-| DELETE | `/todo_list/:id` | Eliminar tarea |
+**Event Delegation**
+- Un solo listener en `#tasks_container` captura clicks en botones de editar/eliminar
+- Evita re-registrar listeners en cada re-render
+- Identificación de acción mediante `data-action` y `data-task-id`
 
----
+**Modales**
+- Controlados mediante clases CSS (`hidden`)
+- Reutilización del mismo modal para crear/editar
+- Estado del formulario limpiado en cada apertura
+- Cierre por overlay, botón X o cancelar
 
-## 🔐 Autenticación
+**Renderizado**
+- Re-render completo de lista en cada cambio de filtro
+- Stats de admin calculadas sobre dataset completo
+- Badges de estado con colores semánticos
 
-El login valida email y contraseña contra la API (`/users`). Al autenticarse correctamente, los datos del usuario se guardan en `localStorage` y se redirige según el rol.
-
-**Cuentas disponibles en db.json:**
-
-| Rol | Email | Contraseña |
-|---|---|---|
-| Admin | juan@mail.com | juancho |
-| User | luisita@mail.com | luisita |
-| User | pedrito@mail.com | pedrito |
+**Paleta Oscura Mate**
+- Tema único sin toggle (no dark mode, es el default)
+- Grises profundos (#111114, #16161a, #1c1c21)
+- Violeta mate como acento (#5b4f8a)
+- Tipografía Inter con antialiasing
 
 ---
 
-## 👥 Roles y permisos
+## Estructura de Datos
 
-### 🔴 Admin
-- Ver **todas** las tareas del sistema
-- Filtrar por estado, búsqueda y usuario
-- Cambiar el estado de cualquier tarea
-- Eliminar cualquier tarea
-- Ver el listado de usuarios registrados
+**Usuario:**
+```json
+{
+  "id": "1",
+  "username": "user.name",
+  "email": "user@mail.com",
+  "password": "plain_text",
+  "full_name": "User Name",
+  "role": "admin|user"
+}
+```
 
-### 🔵 User
-- Ver **únicamente sus propias tareas**
-- Crear nuevas tareas
-- Editar sus propias tareas
-- Filtrar por estado y búsqueda
-
----
-
-## 📋 Modelo de tarea
-
+**Tarea:**
 ```json
 {
   "id": "1",
   "id_user": "2",
-  "title": "Título de la tarea",
+  "title": "Título",
   "description": "Descripción opcional",
-  "status": "initial"
+  "status": "initial|process|completed"
 }
 ```
 
-**Estados posibles:**
+---
 
-| Estado | Descripción |
-|---|---|
-| `initial` | Tarea recién creada, sin iniciar |
-| `process` | Tarea en progreso |
-| `completed` | Tarea finalizada |
+## Optimizaciones
+
+- Debounce en input de búsqueda para reducir re-renders
+- Event delegation en lugar de listeners individuales
+- Fetch paralelo de usuarios y tareas con `Promise.all()`
+- CSS custom properties para paleta de colores reutilizable
+- Lazy loading de vistas (solo se cargan al navegar)
 
 ---
 
-## 🔎 Filtros con Query Params
+## Consideraciones de Seguridad
 
-Los filtros se implementan usando query params en el hash de la URL:
+⚠️ **Proyecto académico** — no apto para producción:
+- Contraseñas en texto plano en `db.json`
+- Sin validación server-side
+- Sin rate limiting
+- Sin sanitización de inputs (XSS vulnerable)
+- Token de sesión en `localStorage` (vulnerable a XSS)
 
-```
-#home?status=completed
-#home?search=comer
-#home?user=2
-#home?status=process&search=estudiar
-```
-
-Los filtros se aplican en tiempo real sin recargar la página y se sincronizan con los inputs del panel de filtros.
-
----
-
-## 🏗️ Arquitectura
-
-La app sigue un patrón **MVC simplificado**:
-
-- **Views** — funciones que retornan HTML como string (sin framework)
-- **Controllers** — manejan la lógica, eventos del DOM y llamadas a la API
-- **Router** — basado en `window.location.hash` con soporte de query params
-- **Layout** — componente reutilizable que envuelve las vistas protegidas
-
-El router escucha los eventos `DOMContentLoaded` y `hashchange` para renderizar la vista correspondiente, verificando autenticación y rol antes de montar cada ruta.
-
----
-
-## 🎨 Diseño
-
-- Paleta oscura mate (sin dark mode toggle, es el tema por defecto)
-- Tipografía **Inter** (Google Fonts)
-- Totalmente responsivo
-- Modales con animación fade-in
-- Scrollbar personalizado
+Para producción se requeriría:
+- Hash de contraseñas (bcrypt)
+- JWT con refresh tokens
+- Validación y sanitización server-side
+- HTTPS obligatorio
+- CORS configurado correctamente
